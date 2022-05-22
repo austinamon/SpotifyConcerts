@@ -1,0 +1,8 @@
+<p>Your top artists: </p>
+<ul>
+  <li *ngFor="let artist of topArtists">
+    {{artist.name}}
+  </li>
+</ul>
+<button *ngIf="!authorized" (click)="authorize()">Authorize</button>
+<button (click)="refresh()">Refresh</button>
