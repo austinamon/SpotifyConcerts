@@ -12,8 +12,8 @@ export class SpotifyService {
   private artistUrl!: string;
   private albumsUrl!: string;
   private albumUrl!: string;
-  private clientId: string = '1873a5b886c34f51927a2e4f395f19bc';
-  private clientSecret: string = 'a52e41f220e042b6a6a3dadab9366ac3';
+  private clientId: string = '';
+  private clientSecret: string = '';
   private body: any;
 
   constructor(private _http: HttpClient) { }
