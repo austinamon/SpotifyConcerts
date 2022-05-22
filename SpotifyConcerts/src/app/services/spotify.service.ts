@@ -12,40 +12,58 @@ export class SpotifyService {
   private artistUrl!: string;
   private albumsUrl!: string;
   private albumUrl!: string;
-  private clientId: string = '1873a5b886c34f51927a2e4f395f19bc';
-  private clientSecret: string = 'a52e41f220e042b6a6a3dadab9366ac3';
+  private clientId: string = '';
+  private clientSecret: string = '';
   private body: any;
 
   constructor(private _http: HttpClient) { }
 
-  authorize() {
-    let headers = new HttpHeaders(
-      {
-        'Access-Control-Allow-Origin': '*'
-      });
+  // authorize() {
+  //   let headers = new HttpHeaders(
+  //     {
+  //       'Access-Control-Allow-Origin': '*'
+  //     });
 
-    let params = new HttpParams()
-      .set('client_id', this.clientId)
-      .set('response_type', 'code')
-      .set('redirect_uri', 'http://localhost:4200/callback')
-      .set('scope', 'user-read-private user-read-email')
-      .set('state', this.randomString(16));
+  //   let params = new HttpParams()
+  //     .set('client_id', this.clientId)
+  //     .set('response_type', 'code')
+  //     .set('redirect_uri', 'http://localhost:4200/callback')
+  //     .set('scope', 'user-read-private user-read-email')
+  //     .set('state', this.randomString(16));
 
-    return this._http.get('https://accounts.spotify.com/authorize?', { headers: headers, params: params });
+  //     //convert headers and params to query string
+  //     let options = { headers: headers, params: params };
+
+  //     return 'https://accounts.spotify.com/authorize?' + options.toQueryString();
+
+  //   return this._http.get('https://accounts.spotify.com/authorize?', { headers: headers, params: params });
+  // }
+
+
+
+  buildSpotifyAuthorizeUrl() {
+    let url = 'https://accounts.spotify.com/authorize?';
+    url += 'client_id=' + this.clientId;
+    url += '&response_type=code';
+    url += '&redirect_uri=http://localhost:4200/callback';
+    url += '&scope=user-top-read';
+    url += '&show_dialog=true';
+
+    return url;
   }
 
-  randomString(length: number) {
-    let text = '';
-    let possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  // randomString(length: number) {
+  //   let text = '';
+  //   let possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
 
-    for (let i = 0; i < length; i++) {
-      text += possible.charAt(Math.floor(Math.random() * possible.length));
-    }
+  //   for (let i = 0; i < length; i++) {
+  //     text += possible.charAt(Math.floor(Math.random() * possible.length));
+  //   }
 
-    return text;
-  }
+  //   return text;
+  // }
   // Get access token from Spotify to use API
-  getAuth = () => {
+  getAuth(code: string) {
 
     let headers = new HttpHeaders(
       {
@@ -59,7 +77,9 @@ export class SpotifyService {
     let params: HttpParams = new HttpParams(
       {
         fromObject: {
-          grant_type: 'client_credentials'
+          grant_type: 'authorization_code',
+          redirect_uri: 'http://localhost:4200/callback',
+          code: code
         }
       });
 
@@ -77,11 +97,11 @@ export class SpotifyService {
   getTopArtists(authToken: string) {
     let headers = new HttpHeaders(
       {
-        'Authorization': 'Bearer ' + authToken,
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + authToken
       });
 
-    return this._http.get('https://api.spotify.com/v1/me/top/artists?time_range=medium_term', { headers: headers });
+    return this._http.get<any>('https://api.spotify.com/v1/me/top/artists', { headers: headers });
   }
 
 
